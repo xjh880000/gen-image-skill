@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>图片画廊</title>
+<style>
+  :root{--bg:#0f1115;--panel:#171a21;--line:#262b36;--line2:#39414f;
+        --fg:#e8eaf0;--fg2:#9aa3b2;--fg3:#6b7484;--ok:#3ecf8e;--bad:#ff6b6b}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+       font:14px/1.6 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+  header{padding:18px 22px 12px;border-bottom:1px solid var(--line);position:sticky;top:0;
+         background:rgba(15,17,21,.93);backdrop-filter:blur(8px);z-index:10}
+  h1{margin:0 0 3px;font-size:16px;font-weight:600}
+  .sub{color:var(--fg3);font-size:12.5px}
+  .sub b{color:var(--fg2);font-weight:500}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+        gap:13px;padding:16px 22px 36px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:11px;
+        overflow:hidden;display:flex;flex-direction:column;transition:border-color .15s,transform .15s}
+  .card:hover{border-color:var(--line2);transform:translateY(-2px)}
+  .card.ok{border-left:3px solid var(--ok)}
+  .card.bad{border-left:3px solid var(--bad)}
+  .thumb{display:block;width:100%;aspect-ratio:1;object-fit:cover;background:#0b0d11;cursor:zoom-in}
+  .meta{padding:9px 11px 11px;display:flex;flex-direction:column;gap:4px}
+  .tag{align-self:flex-start;font-size:11px;font-weight:600;padding:2px 7px;border-radius:999px}
+  .tag.ok{color:var(--ok);background:rgba(62,207,142,.12)}
+  .tag.bad{color:var(--bad);background:rgba(255,107,107,.12)}
+  .title{font-size:13px;font-weight:500;color:var(--fg);overflow-wrap:anywhere}
+  .file{font-size:10.5px;color:var(--fg3);font-family:ui-monospace,Consolas,monospace;
+        overflow-wrap:anywhere}
+  .lb{position:fixed;inset:0;background:rgba(0,0,0,.94);display:none;align-items:center;
+      justify-content:center;z-index:100;cursor:zoom-out;padding:22px}
+  .lb.on{display:flex}
+  .lb img{max-width:100%;max-height:100%;border-radius:8px}
+  .lbcap{position:absolute;bottom:16px;left:0;right:0;text-align:center;color:var(--fg2);font-size:12.5px}
+  .empty{padding:40px 22px;color:var(--fg3)}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="h1">图片画廊</h1>
+  <div class="sub" id="sub">加载中…</div>
+</header>
+<div class="grid" id="grid"></div>
+<div class="lb" id="lb"><img id="lbimg" alt=""><div class="lbcap" id="lbcap"></div></div>
+<script src="gallery.js"></script>
+<script>
+(function(){
+  var G = window.GALLERY;
+  var grid = document.getElementById('grid');
+  if (!G || !G.items || !G.items.length){
+    document.getElementById('sub').textContent = '同目录下没找到 gallery.js 或里面没有图片';
+    return;
+  }
+  document.getElementById('h1').textContent = G.title || '图片画廊';
+  var ok = G.items.filter(function(i){return i.label==='ok';}).length;
+  var bad = G.items.filter(function(i){return i.label==='bad';}).length;
+  document.getElementById('sub').innerHTML =
+    '共 <b>' + G.count + '</b> 张' +
+    (ok ? ' &nbsp;·&nbsp; <b style="color:var(--ok)">正确 ' + ok + '</b>' : '') +
+    (bad ? ' &nbsp;·&nbsp; <b style="color:var(--bad)">错误 ' + bad + '</b>' : '') +
+    ' &nbsp;·&nbsp; 点图放大 &nbsp;·&nbsp; ESC 关闭';
+
+  G.items.forEach(function(it){
+    var card = document.createElement('div');
+    card.className = 'card ' + (it.label || '');
+    var tag = it.label === 'ok' ? '<span class="tag ok">✓ 正确</span>'
+            : it.label === 'bad' ? '<span class="tag bad">✕ 错误</span>' : '';
+    card.innerHTML =
+      '<img class="thumb" loading="lazy" alt="">' +
+      '<div class="meta">' + tag +
+        '<div class="title"></div><div class="file"></div></div>';
+    var img = card.querySelector('.thumb');
+    img.src = encodeURI(it.file);
+    img.alt = it.title || it.file;
+    card.querySelector('.title').textContent = it.title || it.file;
+    card.querySelector('.file').textContent = it.file;
+    img.addEventListener('click', function(){
+      document.getElementById('lbimg').src = encodeURI(it.file);
+      document.getElementById('lbcap').textContent = (it.title || it.file) + '  —  ' + it.file;
+      document.getElementById('lb').classList.add('on');
+    });
+    grid.appendChild(card);
+  });
+
+  var lb = document.getElementById('lb');
+  lb.addEventListener('click', function(){ lb.classList.remove('on'); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') lb.classList.remove('on'); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+# 配置里含 key，不要提交
+config.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# 出图产物
+gen-image-out/
+*.png
+*.jpg
+*.jpeg
+*.webp
+
+# 系统垃圾
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 打包脚本（只是我自己用的，不进仓库）
+_patch.py
+_patch2.py

@@ -1,0 +1,11 @@
+{
+  "base": "https://xyuapi.top/v1",
+  "key": "在这里填你的 key（sk- 开头那串）",
+  "model": "gpt-image-2.5-flare",
+  "chain": [
+    "gpt-image-2.5-flare",
+    "NanoBanana-Pro",
+    "gpt-image-2-pro",
+    "gpt-image-2.5-sunburst"
+  ]
+}
