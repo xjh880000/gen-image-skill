@@ -82,14 +82,29 @@ if [ -n "$SELF_DIR" ] && [ -f "$SELF_DIR/scripts/gen_image.py" ]; then
   ok "用本地文件安装（$SRC）"
 else
   TMP="$(mktemp -d)"
-  URL="https://github.com/$REPO_OWNER/$REPO_NAME/archive/refs/heads/$BRANCH.tar.gz"
+  RAW_TAR="https://github.com/$REPO_OWNER/$REPO_NAME/archive/refs/heads/$BRANCH.tar.gz"
+  SOURCES="https://ghproxy.net/$RAW_TAR
+https://github.com/$REPO_OWNER/$REPO_NAME/archive/refs/heads/$BRANCH.tar.gz"
   echo "  正在下载…"
-  if command -v curl >/dev/null 2>&1; then
-    curl -fsSL "$URL" -o "$TMP/pkg.tar.gz" || { err "下载失败：$URL"; exit 1; }
-  elif command -v wget >/dev/null 2>&1; then
-    wget -q "$URL" -O "$TMP/pkg.tar.gz" || { err "下载失败：$URL"; exit 1; }
-  else
-    err "没有 curl 也没有 wget，没法下载"; exit 1
+  GOT=0
+  for u in $SOURCES; do
+    if command -v curl >/dev/null 2>&1; then
+      curl -fsSL "$u" -o "$TMP/pkg.tar.gz" && GOT=1 && break
+    elif command -v wget >/dev/null 2>&1; then
+      wget -q "$u" -O "$TMP/pkg.tar.gz" && GOT=1 && break
+    else
+      err "没有 curl 也没有 wget，没法下载"; exit 1
+    fi
+    warn "这个通道不行，换下一个…"
+  done
+  if [ "$GOT" -ne 1 ]; then
+    err "所有下载通道都失败了"
+    echo "  试过的地址："
+    for u in $SOURCES; do echo "    $u"; done
+    echo ""
+    echo "  如果都不通，把整个 gen-image-skill 文件夹用微信发过去，"
+    echo "  然后在那个文件夹里跑：bash install.sh \"sk-你的key\""
+    exit 1
   fi
   tar -xzf "$TMP/pkg.tar.gz" -C "$TMP" || { err "解压失败"; exit 1; }
   SRC="$(find "$TMP" -maxdepth 1 -type d -name "$REPO_NAME-*" | head -1)"

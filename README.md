@@ -13,16 +13,23 @@
 按 `Win + R`，输入 `powershell`，回车，然后把下面整行粘进去（把 `sk-` 那串换成你的 key）：
 
 ```powershell
-irm https://raw.githubusercontent.com/xjh880000/gen-image-skill/main/install.ps1 -OutFile "$env:TEMP\gi.ps1"; powershell -ExecutionPolicy Bypass -File "$env:TEMP\gi.ps1" "sk-你的key"
+irm https://ghproxy.net/https://raw.githubusercontent.com/xjh880000/gen-image-skill/main/install.ps1 -OutFile "$env:TEMP\gi.ps1"; powershell -ExecutionPolicy Bypass -File "$env:TEMP\gi.ps1" "sk-你的key"
 ```
+
+> 上面这条走的是国内加速通道（ghproxy）。万一它也抽风，把开头的
+> `https://ghproxy.net/https://raw.githubusercontent.com/` 换成
+> `https://cdn.jsdelivr.net/gh/xjh880000/gen-image-skill@main/` 再试一次。
 
 ### Mac / Linux
 
 打开「终端」，把下面整行粘进去：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/xjh880000/gen-image-skill/main/install.sh | bash -s -- "sk-你的key"
+curl -fsSL https://ghproxy.net/https://raw.githubusercontent.com/xjh880000/gen-image-skill/main/install.sh | bash -s -- "sk-你的key"
 ```
+
+> 这条不通就把 `https://ghproxy.net/https://raw.githubusercontent.com/` 换成
+> `https://cdn.jsdelivr.net/gh/xjh880000/gen-image-skill@main/`。
 
 看到 `装完了` 就是好了。整个过程大概 30 秒。
 

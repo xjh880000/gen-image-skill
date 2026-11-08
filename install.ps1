@@ -78,19 +78,42 @@ if ($selfDir -and (Test-Path (Join-Path $selfDir "scripts\gen_image.py"))) {
 } else {
     $tmp = Join-Path $env:TEMP ("gen-image-" + [guid]::NewGuid().ToString("N").Substring(0,8))
     New-Item -ItemType Directory -Force -Path $tmp | Out-Null
-    $url = "https://github.com/$RepoOwner/$RepoName/archive/refs/heads/$Branch.zip"
+    # 多通道：国内直连 GitHub 常常不通，先走加速镜像
+    $rawZip = "https://github.com/$RepoOwner/$RepoName/archive/refs/heads/$Branch.zip"
+    $sources = @(
+        "https://ghproxy.net/$rawZip",
+        "https://github.com/$RepoOwner/$RepoName/archive/refs/heads/$Branch.zip"
+    )
     Write-Host "  正在下载…"
+    $zip = Join-Path $tmp "pkg.zip"
+    $got = $false
+    foreach ($u in $sources) {
+        try {
+            if (Test-Path $zip) { Remove-Item $zip -Force }
+            Invoke-WebRequest -Uri $u -OutFile $zip -UseBasicParsing -TimeoutSec 90
+            if ((Get-Item $zip).Length -lt 1000) { throw "文件太小，可能不是压缩包" }
+            $got = $true
+            break
+        } catch {
+            Warn "这个通道不行，换下一个…"
+        }
+    }
+    if (-not $got) {
+        Err "所有下载通道都失败了"
+        Write-Host "  试过的地址："
+        foreach ($u in $sources) { Write-Host "    $u" }
+        Write-Host "  如果都不通，把整个 gen-image-skill 文件夹用微信发过去，"
+        Write-Host "  然后在那个文件夹里跑：powershell -ExecutionPolicy Bypass -File .\install.ps1 \"sk-你的key\""
+        exit 1
+    }
     try {
-        $zip = Join-Path $tmp "pkg.zip"
-        Invoke-WebRequest -Uri $url -OutFile $zip -UseBasicParsing -TimeoutSec 120
         Expand-Archive -Path $zip -DestinationPath $tmp -Force
         $found = Get-ChildItem $tmp -Directory | Where-Object { $_.Name -like "$RepoName-*" } | Select-Object -First 1
         if (-not $found) { throw "解压后找不到源码目录" }
         $src = $found.FullName
         Ok "下载完成"
     } catch {
-        Err "下载失败：$($_.Exception.Message)"
-        Write-Host "  地址：$url"
+        Err "解压失败：$($_.Exception.Message)"
         exit 1
     }
 }
