@@ -13,7 +13,7 @@
 按 `Win + R`，输入 `powershell`，回车，然后把下面整行粘进去（把 `sk-` 那串换成你的 key）：
 
 ```powershell
-irm https://raw.githubusercontent.com/__REPO_OWNER__/gen-image-skill/main/install.ps1 -OutFile "$env:TEMP\gi.ps1"; powershell -ExecutionPolicy Bypass -File "$env:TEMP\gi.ps1" "sk-你的key"
+irm https://raw.githubusercontent.com/xjh880000/gen-image-skill/main/install.ps1 -OutFile "$env:TEMP\gi.ps1"; powershell -ExecutionPolicy Bypass -File "$env:TEMP\gi.ps1" "sk-你的key"
 ```
 
 ### Mac / Linux
@@ -21,7 +21,7 @@ irm https://raw.githubusercontent.com/__REPO_OWNER__/gen-image-skill/main/instal
 打开「终端」，把下面整行粘进去：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/__REPO_OWNER__/gen-image-skill/main/install.sh | bash -s -- "sk-你的key"
+curl -fsSL https://raw.githubusercontent.com/xjh880000/gen-image-skill/main/install.sh | bash -s -- "sk-你的key"
 ```
 
 看到 `装完了` 就是好了。整个过程大概 30 秒。

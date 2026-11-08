@@ -12,7 +12,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$RepoOwner = "__REPO_OWNER__"
+$RepoOwner = "xjh880000"
 $RepoName  = "gen-image-skill"
 $Branch    = "main"
 $SkillName = "gen-image"

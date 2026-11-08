@@ -10,7 +10,7 @@
 # ============================================================
 set -uo pipefail
 
-REPO_OWNER="__REPO_OWNER__"
+REPO_OWNER="xjh880000"
 REPO_NAME="gen-image-skill"
 BRANCH="main"
 
